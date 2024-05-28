@@ -17,9 +17,10 @@ public class SlotManager : MonoBehaviour
     private int[] slotStopTimeArrey = new int[] {SLOTFIRSTSTOPTIME, SLOTSECONDSTOPTIME, SLOTLASTSTOPTIME}; // スロットの停止時間をfor文で使うために配列にしておく
 
     /* スロットのリールをいつ停止させるか */
-    const int SLOTFIRSTSTOPTIME = 300;
-    const int SLOTSECONDSTOPTIME = 400;
-    const int SLOTLASTSTOPTIME = 500;
+    const int SLOTFIRSTSTOPTIME = 200;
+    const int SLOTSECONDSTOPTIME = 300;
+    const int SLOTLASTSTOPTIME = 400;
+    const int SLOTSPANTIME = 10; // スロットを何msごとに動かすか
     const int SLOTKINDS = 10; // スロットの数値の種類(現在1 ~ 9, ball)
     // Start is called before the first frame update
     void Start()
@@ -43,6 +44,7 @@ public class SlotManager : MonoBehaviour
             {
                 slotStock -= 1;
                 Debug.Log("現在のストック数:" + slotStock);
+                isSlot = true;
                 SlotStart(); // スロットスタート
             }
         }
@@ -59,11 +61,7 @@ public class SlotManager : MonoBehaviour
         for(int i = 0; i < 3; i++)
         {
             /* スロットのコルーチン */
-            StartCoroutine(SpinCoroutine(slotStopTimeArrey[i], i, () => 
-            {
-                /* スロットの内部の数値と外見の数値が一致するまで、スプライトを張り替える */
-                StartCoroutine(FixCoroutine(i));
-            }));
+            StartCoroutine(SpinCoroutine(slotStopTimeArrey[i], i));
         }
         
         
@@ -72,6 +70,8 @@ public class SlotManager : MonoBehaviour
         {
             Debug.Log(slotNumArrey[0] + "が揃いました");
         }
+        //Debug.Log("外見" + lastSlotNumArrey[0]);
+        //Debug.Log("中身" + slotNumArrey[0]);
         isSlot = false;
     }
 
@@ -82,22 +82,28 @@ public class SlotManager : MonoBehaviour
     }
 
     /* スロットを動かすコルーチン */
-    private IEnumerator SpinCoroutine(int spinms, int spinPlace, System.Action action)
+    private IEnumerator SpinCoroutine(int spinms, int spinPlace)
     {
         /* 指定した時間(ms)スロットを動かす */
         for(int i = 0; i < spinms; i++)
         {
-            lastSlotNumArrey[spinPlace]++;
-            lastSlotNumArrey[spinPlace] %= SLOTKINDS;
-            slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
+            {
+                lastSlotNumArrey[spinPlace]++;
+                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
+                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            }
             yield return null;
         }
 
-        action?.Invoke(); // ?.はnull条件演算子 中身がnullでなければ実行
+        //Debug.Log("外見" + lastSlotNumArrey[spinPlace]);
+        //Debug.Log("中身" + slotNumArrey[spinPlace]);
+        /* スロットの内部の数値と外見の数値が一致するまで、スプライトを張り替える */
+        StartCoroutine(FixCoroutine(spinPlace));
     }
     
-    /*スロットの外見と中身を一致させるコルーチン */
-    private IEnumerator FixCoroutine(int spinPlace)
+    /* スロットの外見と中身を一致させる関数 */
+    private void FixSlotNum(int spinPlace)
     {
         /* 100回スロットを動かす */
         for(int i = 0; i < 100; i++)
@@ -105,10 +111,31 @@ public class SlotManager : MonoBehaviour
             lastSlotNumArrey[spinPlace]++;
             lastSlotNumArrey[spinPlace] %= SLOTKINDS;
             slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
-            /* スロットの数値の同期が完了したらコルーチン終了 */
+            //Debug.Log("外見" + lastSlotNumArrey[spinPlace]);
+            //Debug.Log("中身" + slotNumArrey[spinPlace]);
+            /* スロットの数値の同期が完了したら関数終了 */
             if(lastSlotNumArrey[spinPlace] == slotNumArrey[spinPlace])
             {
-                yield break;
+                break;
+            }
+        }
+    }
+
+    /* スロットの外見と中身を一致させるコルーチン */
+    private IEnumerator FixCoroutine(int spinPlace)
+    {
+        for(int i = 0; i < SLOTKINDS * SLOTSPANTIME; i++)
+        {
+            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
+            {
+                lastSlotNumArrey[spinPlace]++;
+                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
+                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            }
+            /* スロットの数値の同期が完了したら関数終了 */
+            if(lastSlotNumArrey[spinPlace] == slotNumArrey[spinPlace])
+            {
+                break;
             }
             yield return null;
         }
