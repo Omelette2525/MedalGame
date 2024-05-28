@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Cinemachine;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ public class SCManager : MonoBehaviour
     const int SHADOWNORMALMAT = 2;
     const int SHADOWJPCMAT = 3;
     /* その他定数 */
-    const int WAIT = 300; // 演出のためにわざと遅延させる
+    const int WAIT = 3000; // 演出のためにわざと遅延させる
     // Start is called before the first frame update
     void Start()
     {
@@ -57,7 +58,7 @@ public class SCManager : MonoBehaviour
         SCRotateScript.rotateFlag = true; // 回転開始
         isSC = true; // SC中フラグを有効にする
     }
-    public void PocketIn()
+    public async void PocketIn()
     {
         SCRotateScript.rotateFlag = false; // 回転ストップ
 
@@ -103,20 +104,15 @@ public class SCManager : MonoBehaviour
             SCPocketArray[stopNumber] = JPCPOCKET; // jpcポケットに変化
         }
         /* デリゲートを用いて、アクションを起こしたあとに間を入れる */
-        /* カメラ切り替え、間、フラグ処理、間 */
-        StartCoroutine(DelayCoroutine(WAIT, () =>
-        {
-            SCCamera.GetComponent<CinemachineVirtualCamera>().Priority = 1; // カメラ切り替え
-            Debug.Log("カメラ");
-            StartCoroutine(DelayCoroutine(WAIT, () =>
-            {
-                SCRotateScript.rotateFlag = true; // 回転開始
-                isSC = false; // SC中フラグを無効にする
-                Debug.Log("フラグ");
-            })); // 待機
-        })); // 待機
-        
-        
+        /* 間、カメラ切り替え、間、フラグ処理、間 */
+        await WaitTaskAsync(WAIT);
+        SCCamera.GetComponent<CinemachineVirtualCamera>().Priority = 1; // カメラ切り替え
+        Debug.Log("カメラ");
+        await WaitTaskAsync(WAIT);
+        SCRotateScript.rotateFlag = true; // 回転開始
+        isSC = false; // SC中フラグを無効にする
+        Debug.Log("フラグ");
+        await WaitTaskAsync(WAIT);
     }
     public void SCStockPlus()
     {
@@ -132,5 +128,11 @@ public class SCManager : MonoBehaviour
         }
 
         action?.Invoke(); // ?.はnull条件演算子 中身がnullでなければ実行
+    }
+
+    /* 指定した時間待機するタスク */
+    private async Task WaitTaskAsync(int delayms)
+    {
+        await Task.Delay(delayms);
     }
 }
