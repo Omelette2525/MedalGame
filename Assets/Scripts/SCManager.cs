@@ -103,7 +103,7 @@ public class SCManager : MonoBehaviour
             }
             SCPocketArray[stopNumber] = JPCPOCKET; // jpcポケットに変化
         }
-        /* デリゲートを用いて、アクションを起こしたあとに間を入れる */
+        /* 非同期処理を用いて、間を入れる */
         /* 間、カメラ切り替え、間、フラグ処理、間 */
         await WaitTaskAsync(WAIT);
         SCCamera.GetComponent<CinemachineVirtualCamera>().Priority = 1; // カメラ切り替え
@@ -117,17 +117,6 @@ public class SCManager : MonoBehaviour
     public void SCStockPlus()
     {
         SCStock ++;
-    }
-
-    private IEnumerator DelayCoroutine(int delayms, System.Action action)
-    {
-        /* 指定した時間(ms)待つ */
-        for(int i = 0; i < delayms; i++)
-        {
-            yield return null;
-        }
-
-        action?.Invoke(); // ?.はnull条件演算子 中身がnullでなければ実行
     }
 
     /* 指定した時間待機するタスク */
