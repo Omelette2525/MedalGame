@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.UIElements;
@@ -17,10 +18,12 @@ public class SlotManager : MonoBehaviour
     private int[] slotStopTimeArrey = new int[] {SLOTFIRSTSTOPTIME, SLOTSECONDSTOPTIME, SLOTLASTSTOPTIME}; // スロットの停止時間をfor文で使うために配列にしておく
 
     /* スロットのリールをいつ停止させるか */
-    const int SLOTFIRSTSTOPTIME = 300;
-    const int SLOTSECONDSTOPTIME = 400;
-    const int SLOTLASTSTOPTIME = 500;
+    const int SLOTFIRSTSTOPTIME = 200;
+    const int SLOTSECONDSTOPTIME = 300;
+    const int SLOTLASTSTOPTIME = 400;
+    const int SLOTSPANTIME = 10; // スロットを何msごとに動かすか
     const int SLOTKINDS = 10; // スロットの数値の種類(現在1 ~ 9, ball)
+    const int WAIT = 1000; // 演出のためにわざと遅延させる
     // Start is called before the first frame update
     void Start()
     {
@@ -43,12 +46,13 @@ public class SlotManager : MonoBehaviour
             {
                 slotStock -= 1;
                 Debug.Log("現在のストック数:" + slotStock);
+                isSlot = true;
                 SlotStart(); // スロットスタート
             }
         }
     }
 
-    public void SlotStart()
+    public async void SlotStart()
     {
         isSlot = true;
         /* スロットの中身をランダムに変更 完全ランダム*/
@@ -56,22 +60,20 @@ public class SlotManager : MonoBehaviour
         slotNumArrey[1] = UnityEngine.Random.Range(0, 10);
         slotNumArrey[2] = UnityEngine.Random.Range(0, 10);
 
-        for(int i = 0; i < 3; i++)
-        {
-            /* スロットのコルーチン */
-            StartCoroutine(SpinCoroutine(slotStopTimeArrey[i], i, () => 
-            {
-                /* スロットの内部の数値と外見の数値が一致するまで、スプライトを張り替える */
-                StartCoroutine(FixCoroutine(i));
-            }));
-        }
-        
+        /* スロットの非同期メソッド */
+        Task TaskA = SpinAsync(slotStopTimeArrey[0], 0);
+        Task TaskB = SpinAsync(slotStopTimeArrey[1], 1);
+        Task TaskC = SpinAsync(slotStopTimeArrey[2], 2);
+
+        await Task.WhenAll(TaskA, TaskB, TaskC); // 全タスクが終わるまで待機
         
         /* スロットの数値がすべて一致したら、あたり */
         if(slotNumArrey[0] == slotNumArrey[1] && slotNumArrey[1] == slotNumArrey[2])
         {
             Debug.Log(slotNumArrey[0] + "が揃いました");
         }
+
+        await WaitTaskAsync(WAIT); // 連続しないように少し待機
         isSlot = false;
     }
 
@@ -81,36 +83,45 @@ public class SlotManager : MonoBehaviour
         Debug.Log("現在のストック数:" + slotStock);
     }
 
-    /* スロットを動かすコルーチン */
-    private IEnumerator SpinCoroutine(int spinms, int spinPlace, System.Action action)
+    /* スロットを動かす非同期メソッド */
+    private async Task SpinAsync(int spinms, int spinPlace)
     {
         /* 指定した時間(ms)スロットを動かす */
         for(int i = 0; i < spinms; i++)
         {
-            lastSlotNumArrey[spinPlace]++;
-            lastSlotNumArrey[spinPlace] %= SLOTKINDS;
-            slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
-            yield return null;
+            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
+            {
+                lastSlotNumArrey[spinPlace]++;
+                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
+                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            }
+            await Task.Delay(1); // 1ms待機
         }
 
-        action?.Invoke(); // ?.はnull条件演算子 中身がnullでなければ実行
-    }
-    
-    /*スロットの外見と中身を一致させるコルーチン */
-    private IEnumerator FixCoroutine(int spinPlace)
-    {
+        /* スロットの外見と中身を一致させる */
         /* 100回スロットを動かす */
         for(int i = 0; i < 100; i++)
         {
-            lastSlotNumArrey[spinPlace]++;
-            lastSlotNumArrey[spinPlace] %= SLOTKINDS;
-            slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
-            /* スロットの数値の同期が完了したらコルーチン終了 */
+            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
+            {
+                lastSlotNumArrey[spinPlace]++;
+                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
+                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            }
+            //Debug.Log("外見" + lastSlotNumArrey[spinPlace]);
+            //Debug.Log("中身" + slotNumArrey[spinPlace]);
+            /* スロットの数値の同期が完了したら関数終了 */
             if(lastSlotNumArrey[spinPlace] == slotNumArrey[spinPlace])
             {
-                yield break;
+                break;
             }
-            yield return null;
+            await Task.Delay(1); // 1ms待機
         }
+    }
+
+    /* 指定した時間待機するタスク */
+    private async Task WaitTaskAsync(int delayms)
+    {
+        await Task.Delay(delayms);
     }
 }
