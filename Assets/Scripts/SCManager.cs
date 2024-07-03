@@ -8,12 +8,13 @@ using UnityEngine;
 public class SCManager : MonoBehaviour
 {
     [SerializeField] private SCRotate SCRotateScript;
+    [SerializeField] private SlotManager SlotManagerScript;
     [SerializeField] private CinemachineVirtualCamera SCCamera;
     private Vector3 rotateInit; // 初期位置
     private Vector3 stopRotate; // 停止位置の角度
     private int stopNumber; // 停止位置のポケットナンバー
     public static int[] SCPocketArray = {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}; // 各ポケットの状態 0が通常,1がjpc 0~5がbright, 6~11がshadow
-    private bool isSC = false; // SC中かどうか
+    public bool isSC = false; // SC中かどうか
     public static int SCStock = 0; // SCの残り回数
     [SerializeField] private GameObject[] pizzaArray; 
     [SerializeField] private Material[] materialArray;
@@ -36,13 +37,17 @@ public class SCManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /* ストックがあって、SC中でないならSC開始 */
+        /* ストックがあって、SC中, スロット中でないならSC開始 */
         if(SCStock >= 1)
         {
-            if(isSC != true)
+            if(isSC != true && SlotManagerScript.isSlot != true)
             {
                 SCStock -= 1;
                 SCStart();
+            }
+            else if(SlotManagerScript.isSlot)
+            {
+                Debug.Log("スロット中なので、SC拒否");
             }
         }
     }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1344,7 +1344,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SCRotateScript: {fileID: 871237673}
+  SlotManagerScript: {fileID: 1917178104}
   SCCamera: {fileID: 149606281}
+  isSC: 0
   pizzaArray:
   - {fileID: 450366647}
   - {fileID: 1057136010}
@@ -12065,6 +12067,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 238d2a21a308eaa40984a7186efbe074, type: 3}
   - {fileID: 21300000, guid: 82c359665d679f9429ddfbffec90f405, type: 3}
   - {fileID: 21300000, guid: 37607af91ed8236419670d570e1a3ffe, type: 3}
+  SCManagerScript: {fileID: 359935756}
+  isSlot: 0
 --- !u!4 &1917178105
 Transform:
   m_ObjectHideFlags: 0
