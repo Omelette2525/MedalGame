@@ -8,13 +8,13 @@ using UnityEngine.UIElements;
 
 public class SlotManager : MonoBehaviour
 {
-    // [SerializeField] private GameObject[] slotArrey; // 各スロットのゲームオブジェクトを入れる
     [SerializeField] private SpriteRenderer[] slotSprArrey; // 各スロットのスプライトレンダラーを入れる
     [SerializeField] private UnityEngine.Sprite[] sprArrey; // スロットの描画スプライトを入れる(1 ~ 9, ballなど)
+    [SerializeField] private SCManager SCManagerScript;
     private int[] slotNumArrey = new int[] {0, 0, 0}; // 内部のスロット情報 0から順に左、右、真ん中
     private int[] lastSlotNumArrey = new int[] {0, 0, 0}; // 前回のスロットの数字を記憶する(スプライトの張り替えに使う)
     public static int slotStock; // スロットのストック数
-    private bool isSlot = false; // スロットが動いているかどうか
+    public bool isSlot = false; // スロットが動いているかどうか
     private int[] slotStopTimeArrey = new int[] {SLOTFIRSTSTOPTIME, SLOTSECONDSTOPTIME, SLOTLASTSTOPTIME}; // スロットの停止時間をfor文で使うために配列にしておく
 
     /* スロットのリールをいつ停止させるか */
@@ -40,14 +40,18 @@ public class SlotManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isSlot != true) // スロットが動いていない
+        /* ストックがあって、スロット中、SC中でないならスロット開始 */
+        if(slotStock >= 1)
         {
-            if(slotStock >= 1) // ストックが1以上なら
+            if(isSlot != true && SCManagerScript.isSC != true)
             {
                 slotStock -= 1;
                 Debug.Log("現在のストック数:" + slotStock);
-                isSlot = true;
                 SlotStart(); // スロットスタート
+            }
+            else if(SCManagerScript.isSC)
+            {
+                Debug.Log("SC中なので、スロット拒否");
             }
         }
     }
@@ -75,6 +79,7 @@ public class SlotManager : MonoBehaviour
 
         await WaitTaskAsync(WAIT); // 連続しないように少し待機
         isSlot = false;
+        await WaitTaskAsync(WAIT); // 他の処理(SCなど)との衝突を避けるために、フラグ処理後も遅延させる
     }
 
     public void SlotStockPlus()
