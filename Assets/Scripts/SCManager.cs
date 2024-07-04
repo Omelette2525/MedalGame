@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cinemachine;
 using UnityEngine;
+using CommonConst;
 
 public class SCManager : MonoBehaviour
 {
@@ -117,7 +118,6 @@ public class SCManager : MonoBehaviour
         SCRotateScript.rotateFlag = true; // 回転開始
         isSC = false; // SC中フラグを無効にする
         Debug.Log("フラグ");
-        await WaitTaskAsync(WAIT); // この関数はUpdate内でawaitされていないので、このTaskの終了を待つことなくアップデートが実行されてしまう
     }
     public void SCStockPlus()
     {
