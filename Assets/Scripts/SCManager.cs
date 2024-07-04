@@ -47,7 +47,7 @@ public class SCManager : MonoBehaviour
             }
             else if(SlotManagerScript.isSlot)
             {
-                Debug.Log("スロット中なので、SC拒否");
+                //Debug.Log("スロット中なので、SC拒否");
             }
         }
     }
@@ -117,7 +117,7 @@ public class SCManager : MonoBehaviour
         SCRotateScript.rotateFlag = true; // 回転開始
         isSC = false; // SC中フラグを無効にする
         Debug.Log("フラグ");
-        await WaitTaskAsync(WAIT);
+        await WaitTaskAsync(WAIT); // この関数はUpdate内でawaitされていないので、このTaskの終了を待つことなくアップデートが実行されてしまう
     }
     public void SCStockPlus()
     {
