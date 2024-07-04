@@ -121,7 +121,7 @@ public class SCManager : MonoBehaviour
     }
     public void SCStockPlus()
     {
-        SCStock ++;
+        SCStock++;
     }
 
     /* 指定した時間待機するタスク */

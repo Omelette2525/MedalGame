@@ -24,6 +24,9 @@ public class SlotManager : MonoBehaviour
     const int SLOTSPANTIME = 10; // スロットを何msごとに動かすか
     const int SLOTKINDS = 10; // スロットの数値の種類(現在1 ~ 9, ball)
     const int WAIT = 1000; // 演出のためにわざと遅延させる
+    /* 何回転か回したら、乱数抽選をするようにする。当選確率はだんだん上がっていく。乱数で当選した場合、7を除いた何かが必ず当たり、確率をリセット */
+    const int SLOTADGETWHEEL = 2; // 当選確率が上がるために何回転必要か
+    const float SLOTADPERCENT = 10; // 当選確率を1回で何パーセント上げるか
     // Start is called before the first frame update
     void Start()
     {
