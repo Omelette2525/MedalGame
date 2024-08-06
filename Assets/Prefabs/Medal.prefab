@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5179981575435396224}
   - component: {fileID: 7875288412510474262}
   - component: {fileID: 6571666830942383848}
-  - component: {fileID: -8861937791089060475}
+  - component: {fileID: 6556510903486607744}
   m_Layer: 0
   m_Name: Medal
   m_TagString: Medal
@@ -135,7 +135,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &-8861937791089060475
+--- !u!114 &6556510903486607744
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4012962818260688978}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6312b31742ae21945878b8cda0ebe287, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f6b92a5c3a81284db6e56f9dee983e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   boaderZ: -7

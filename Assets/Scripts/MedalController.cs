@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MedalDestroy : MonoBehaviour
+public class MedalController : MonoBehaviour
 {
-    private PlayerDataManager playerDataScript;
+    [SerializeField] private PlayerDataManager playerDataScript; // prefabにシーン内のオブジェクトをアタッチすることはできないので、生成したメダルはアタッチが外れている
     [SerializeField] private float boaderZ; // 横穴に落ちたかどうかはz軸で判定
     [SerializeField] private float boaderY; // 一定の高さまで落ちたメダルを消去する
     // Start is called before the first frame update
     void Start()
     {
-        playerDataScript = GameObject.Find("GameManager").GetComponent<PlayerDataManager>(); // prefabにスクリプトをアタッチできないので、getcomponentで持ってくる
+        
     }
 
     // Update is called once per frame
@@ -25,5 +25,11 @@ public class MedalDestroy : MonoBehaviour
             }
             Destroy(gameObject); // メダルを消去
         }
+    }
+
+    /* 生成する際に外れたアタッチをつける */
+    public void MedalSetUp(PlayerDataManager script)
+    {
+        playerDataScript = script; // 受け取ったスクリプトをセットする
     }
 }
