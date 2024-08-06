@@ -33,7 +33,6 @@ public class SlotManager : MonoBehaviour
         /* 最初は0(スロットの1)で初期化 */
         for(int i = 0; i < 3; i++)
         {
-            // slotSprArrey[i] = slotArrey[i].GetComponent<SpriteRenderer>(); // スプライトレンダラーを取得
             slotNumArrey[i] = 0;
             lastSlotNumArrey[i] = 0;
             slotSprArrey[i].sprite = sprArrey[0]; // スプライトを変更
@@ -54,7 +53,7 @@ public class SlotManager : MonoBehaviour
             }
             else if(SCManagerScript.isSC)
             {
-                Debug.Log("SC中なので、スロット拒否");
+                //Debug.Log("SC中なので、スロット拒否");
             }
         }
     }
