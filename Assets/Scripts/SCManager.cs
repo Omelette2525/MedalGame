@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cinemachine;
 using UnityEngine;
-using CommonConst;
+using CommonConst; // 共通定数を扱うためにusing
 
 public class SCManager : MonoBehaviour
 {
