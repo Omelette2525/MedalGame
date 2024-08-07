@@ -12,8 +12,6 @@ public class SCManager : MonoBehaviour
     [SerializeField] private SlotManager SlotManagerScript;
     [SerializeField] private CinemachineVirtualCamera SCCamera;
     private Vector3 rotateInit; // 初期位置
-    private Vector3 stopRotate; // 停止位置の角度
-    private int stopNumber; // 停止位置のポケットナンバー
     public static int[] SCPocketArray = {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}; // 各ポケットの状態 0が通常,1がjpc 0~5がbright, 6~11がshadow
     public bool isSC = false; // SC中かどうか
     public static int SCStock = 0; // SCの残り回数
@@ -69,8 +67,8 @@ public class SCManager : MonoBehaviour
         SCRotateScript.rotateFlag = false; // 回転ストップ
 
         Debug.Log(SCRotateScript.rotateObj.localEulerAngles);
-        stopRotate = SCRotateScript.currentAngle; // 内部角度を取得
-        stopNumber = Mathf.Clamp((int)Mathf.Floor(stopRotate.x / 30.0f), 0, 11); // 30度区切りで停止位置を判定する 0 ~ 11
+        Vector3 stopRotate = SCRotateScript.currentAngle; // 停止位置の内部角度を取得
+        int stopNumber = Mathf.Clamp((int)Mathf.Floor(stopRotate.x / 30.0f), 0, 11); // 30度区切りで停止位置を判定し、番号を割り当てる 0 ~ 11
         Debug.Log("停止角度は" + stopRotate);
         Debug.Log("停止ポケットは" + stopNumber);
         if(SCPocketArray[stopNumber] == JPCPOCKET) // jpcなら

@@ -5,11 +5,11 @@ using UnityEngine;
 public class BallController : MonoBehaviour
 {
     [SerializeField] private float boaderY; // 一定の高さまで落ちたボールを消去する
-    private SCManager SCManagerScript;
+    [SerializeField] private SCManager SCManagerScript;
     // Start is called before the first frame update
     void Start()
     {
-        SCManagerScript = GameObject.Find("GameManager").GetComponent<SCManager>(); // prefabにスクリプトをアタッチできないので、getcomponentで持ってくる
+        // SCManagerScript = GameObject.Find("GameManager").GetComponent<SCManager>(); // prefabにスクリプトをアタッチできないので、getcomponentで持ってくる
     }
 
     // Update is called once per frame

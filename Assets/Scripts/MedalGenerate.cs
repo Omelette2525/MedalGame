@@ -15,8 +15,6 @@ public class MedalGenerate : MonoBehaviour
     public float medalPosY;
     public float medalPosZ;
     private float currentTime; // タイマー
-    private Vector3 cursorPos; //マウスカーソルの位置
-    private Vector3 medalPos; // メダルを出現させる位置
     // Start is called before the first frame update
     void Start()
     {
@@ -31,7 +29,7 @@ public class MedalGenerate : MonoBehaviour
         /* trueならメダルを投げる */
         if(throwJudge == true)
         {
-            cursorPos = Input.mousePosition; // マウスカーソルの位置を取得
+            Vector3 cursorPos = Input.mousePosition; // マウスカーソルの位置を取得
             /* x座標の補正 */
             if(cursorPos.x < medalBorderLeft)
             {
@@ -42,16 +40,22 @@ public class MedalGenerate : MonoBehaviour
                 cursorPos.x = medalBorderRight;
             }
             cursorPos.z = 10; // z座標を適当に代入
-            medalPos = Camera.main.ScreenToWorldPoint(cursorPos); // マウスカーソルの位置をワールド座標に変換
-            medalPos.y = medalPosY; //YとZ座標はあらかじめ決められた位置にセット
+            Vector3 medalPos = Camera.main.ScreenToWorldPoint(cursorPos); // マウスカーソルの位置をワールド座標に変換し、メダル出現位置とする
+            /* YとZ座標はあらかじめ決められた位置にセット */
+            medalPos.y = medalPosY;
             medalPos.z = medalPosZ;
-
-            genMedal = Instantiate(medal, medalPos, medal.transform.rotation); // メダルを出す
-            genMedal.MedalSetUp(playerDataScript); // メダルにアタッチするスクリプト(MedalDestroy)で必要なスクリプトを引数で渡す　GetComponentする必要がなくなるので、cpu負荷減
+            MedalGen(medalPos); // カーソル位置にメダル生成
 
             playerDataScript.medal -= 1; // メダルを減らす
             currentTime = coolTime; // クールタイムリセット
         }
+    }
+
+    /* メダル生成 */
+    void MedalGen(Vector3 medalPos)
+    {
+        genMedal = Instantiate(medal, medalPos, medal.transform.rotation); // メダルを出す
+        genMedal.MedalSetUp(playerDataScript); // メダルにアタッチするスクリプト(MedalDestroy)で必要なスクリプトを引数で渡す　GetComponentする必要がなくなるので、cpu負荷減
     }
 
     /* メダルを投げるかの判定 */
