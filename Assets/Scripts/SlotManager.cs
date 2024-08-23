@@ -15,13 +15,16 @@ public class SlotManager : MonoBehaviour
     private int[] lastSlotNumArrey = new int[] {0, 0, 0}; // 前回のスロットの数字を記憶する(スプライトの張り替えに使う)
     public static int slotStock; // スロットのストック数
     public bool isSlot = false; // スロットが動いているかどうか
-    private int[] slotStopTimeArrey = new int[] {SLOTFIRSTSTOPTIME, SLOTSECONDSTOPTIME, SLOTLASTSTOPTIME}; // スロットの停止時間をfor文で使うために配列にしておく
+    private float[] slotStopTimeArrey = new float[] {SLOTFIRSTSTOPTIME, SLOTSECONDSTOPTIME, SLOTLASTSTOPTIME}; // スロットの停止時間をfor文で使うために配列にしておく
+
+    const int SLOTSTOCKMAX = 50; // スロットストックの上限
 
     /* スロットのリールをいつ停止させるか */
-    const int SLOTFIRSTSTOPTIME = 200;
-    const int SLOTSECONDSTOPTIME = 300;
-    const int SLOTLASTSTOPTIME = 400;
-    const int SLOTSPANTIME = 10; // スロットを何msごとに動かすか
+    const float SLOTFIRSTSTOPTIME = 1.5f; // 1.5秒後に停止
+    const float SLOTSECONDSTOPTIME = 2.0f;
+    const float SLOTLASTSTOPTIME = 2.5f;
+    const int SLOTSPANTIME = 50; // スロットを何msごとに動かすか
+    const int SLOTSPANLATETIME = 100; // スロットの終わり際(内部と外見の出目の調整フェーズ)で何msごとに動かすか 緩急をつけることができる
     const int SLOTKINDS = 10; // スロットの数値の種類(現在1 ~ 9, ball)
     const int WAIT = 1000; // 演出のためにわざと遅延させる
     /* 何回転か回したら、乱数抽選をするようにする。当選確率はだんだん上がっていく。乱数で当選した場合、7を除いた何かが必ず当たり、確率をリセット */
@@ -84,46 +87,42 @@ public class SlotManager : MonoBehaviour
         await WaitTaskAsync(WAIT); // 他の処理(SCなど)との衝突を避けるために、フラグ処理後も遅延させる
     }
 
-    public void SlotStockPlus()
-    {
-        slotStock++;
-        Debug.Log("現在のストック数:" + slotStock);
-    }
-
     /* スロットを動かす非同期メソッド */
-    private async Task SpinAsync(int spinms, int spinPlace)
+    private async Task SpinAsync(float spinSecond, int spinPlace)
     {
-        /* 指定した時間(ms)スロットを動かす */
-        for(int i = 0; i < spinms; i++)
+        /* 指定した時間スロットを動かす */
+        float currentTime = 0; // 現実世界でどのくらい時間が経ったかを入れる　端末スペックに関係なく決めた時間スロットを回すことが可能
+        while(currentTime <= spinSecond)
         {
-            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
-            {
-                lastSlotNumArrey[spinPlace]++;
-                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
-                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
-            }
-            await Task.Delay(1); // 1ms待機
+            lastSlotNumArrey[spinPlace]++;
+            lastSlotNumArrey[spinPlace] %= SLOTKINDS; // 配列オーバーしないように種類数であまりをとる
+            slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
+            currentTime += Time.deltaTime + (SLOTSPANTIME / 1000f); // 現実世界での経過時間とスロット外見の切り替え時のディレイ(msなので1000fで割る 1000だとint / int = intになる)を経過時間に加算
+            Debug.Log(spinPlace + ": " + currentTime);
+            await Task.Delay(SLOTSPANTIME); // SLOTSPANTIME分待機            
         }
 
         /* スロットの外見と中身を一致させる */
-        /* 100回スロットを動かす */
-        for(int i = 0; i < 100; i++)
+        while(lastSlotNumArrey[spinPlace] != slotNumArrey[spinPlace]) // 外見と中身が一致していない間
         {
-            if(i % SLOTSPANTIME == 0) // スロットを回す間隔になったら
-            {
-                lastSlotNumArrey[spinPlace]++;
-                lastSlotNumArrey[spinPlace] %= SLOTKINDS;
-                slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
-            }
+            lastSlotNumArrey[spinPlace]++;
+            lastSlotNumArrey[spinPlace] %= SLOTKINDS;
+            slotSprArrey[spinPlace].sprite = sprArrey[lastSlotNumArrey[spinPlace]];
             //Debug.Log("外見" + lastSlotNumArrey[spinPlace]);
             //Debug.Log("中身" + slotNumArrey[spinPlace]);
             /* スロットの数値の同期が完了したら関数終了 */
-            if(lastSlotNumArrey[spinPlace] == slotNumArrey[spinPlace])
-            {
-                break;
-            }
-            await Task.Delay(1); // 1ms待機
+            await Task.Delay(SLOTSPANLATETIME); // 待機
         }
+    }
+
+    /* スロットストックを増やすメソッド 上限に達していたら増えない */
+    public void SlotStockPlus()
+    {
+        if(slotStock < SLOTSTOCKMAX) // 上限未満なら増やす
+        {
+            slotStock++;
+        }
+        Debug.Log("現在のストック数:" + slotStock);
     }
 
     /* 指定した時間待機するタスク */

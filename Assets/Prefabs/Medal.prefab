@@ -94,7 +94,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4012962818260688978}
   serializedVersion: 4
-  m_Mass: 10
+  m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -120,7 +120,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4012962818260688978}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 2fa42a8c67a5eac438d56208f6c974f5, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -147,5 +147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6b92a5c3a81284db6e56f9dee983e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerDataScript: {fileID: 0}
   boaderZ: -7
   boaderY: -5

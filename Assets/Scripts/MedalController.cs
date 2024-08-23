@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class MedalController : MonoBehaviour
 {
-    [SerializeField] private PlayerDataManager playerDataScript; // prefabにシーン内のオブジェクトをアタッチすることはできないので、生成したメダルはアタッチが外れている
+    /* prefabにシーン内のオブジェクトをアタッチすることはできないので、生成したメダルはアタッチが外れている */
+    [SerializeField] private PlayerDataManager playerDataScript; // 落下時に所持メダルを増やすためにアタッチ
+    [SerializeField] private SlotManager slotScript; // スロットストックを増やすためにアタッチ
     [SerializeField] private float boaderZ; // 横穴に落ちたかどうかはz軸で判定
     [SerializeField] private float boaderY; // 一定の高さまで落ちたメダルを消去する
     // Start is called before the first frame update
@@ -16,7 +18,7 @@ public class MedalController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(gameObject.transform.position.y < boaderY && CompareTag("Medal")) // メダルが落ちた
+        if(gameObject.transform.position.y < boaderY) // メダルが落ちた
         {
             if(gameObject.transform.position.z < boaderZ) // 手前側で落ちたらメダルゲット
             {
@@ -28,8 +30,19 @@ public class MedalController : MonoBehaviour
     }
 
     /* 生成する際に外れたアタッチをつける */
-    public void MedalSetUp(PlayerDataManager script)
+    public void MedalSetUp(PlayerDataManager getPlayerScript, SlotManager getSlotScript)
     {
-        playerDataScript = script; // 受け取ったスクリプトをセットする
+        /* 受け取ったスクリプトをセットする */
+        playerDataScript = getPlayerScript;
+        slotScript = getSlotScript;
+    }
+
+    /* スロットチェッカーを通過したらスロットストックを増やす */
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("SlotChecker"))
+        {
+            slotScript.SlotStockPlus();
+        }        
     }
 }
