@@ -63,7 +63,7 @@ public class MedalGenerate : MonoBehaviour
     void MedalGen(Vector3 medalPos)
     {
         genMedal = Instantiate(medal, medalPos, medal.transform.rotation); // メダルを出す
-        genMedal.MedalSetUp(playerDataScript, slotScript); // メダルにアタッチするスクリプト(MedalDestroy)で必要なスクリプトを引数で渡す　GetComponentする必要がなくなるので、cpu負荷減
+        genMedal.MedalSetUp(playerDataScript, slotScript); // メダルにアタッチするスクリプト(MedalController)で必要なスクリプトを引数で渡す　GetComponentする必要がなくなるので、cpu負荷減
     }
 
     /* メダルを投げるかの判定 */

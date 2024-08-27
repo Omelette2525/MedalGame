@@ -5,7 +5,7 @@ using UnityEngine;
 public class BallController : MonoBehaviour
 {
     [SerializeField] private float boaderY; // 一定の高さまで落ちたボールを消去する
-    [SerializeField] private SCManager SCManagerScript;
+    [SerializeField] private SCManager SCManagerScript; // 生成したボールはアタッチが外れている
     // Start is called before the first frame update
     void Start()
     {
@@ -20,5 +20,10 @@ public class BallController : MonoBehaviour
             SCManagerScript.SCStockPlus(); // static変数にアクセスできないので、メソッドからストックを増やす
             Destroy(gameObject); // ボールを消去
         }
+    }
+
+    public void BallSetUp(SCManager SCscript)
+    {
+        SCManagerScript = SCscript; // スクリプトをセット
     }
 }
