@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerDataManager : MonoBehaviour
 {
-    public int medal; // 所持メダル
+    public int medal; // 所持メダル 初期値はインスペクターで指定可能
     private bool isSupply = false;
     const int SUPPLYBOR = 100; // メダル補給するかどうかのボーダー
     const int SUPPLYTIME = 6000; // メダル補給にかかる時間

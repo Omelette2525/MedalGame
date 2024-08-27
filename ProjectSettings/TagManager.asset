@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Medal
   - Ball
+  - SlotChecker
   layers:
   - Default
   - TransparentFX
