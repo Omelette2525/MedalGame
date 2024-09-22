@@ -7,6 +7,13 @@ TagManager:
   - Medal
   - Ball
   - SlotChecker
+  - SCTrigger
+  - JPC100Trigger
+  - JPC200Trigger
+  - JPC50Trigger
+  - JPCOUTTrigger
+  - JPCJPTrigger
+  - JPC300Trigger
   layers:
   - Default
   - TransparentFX

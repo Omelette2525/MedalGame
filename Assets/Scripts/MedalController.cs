@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using CommonConst;
 using UnityEngine;
 
 public class MedalController : MonoBehaviour
 {
     /* prefabにシーン内のオブジェクトをアタッチすることはできないので、生成したメダルはアタッチが外れている */
-    [SerializeField] private PlayerDataManager playerDataScript; // 落下時に所持メダルを増やすためにアタッチ
-    [SerializeField] private SlotManager slotScript; // スロットストックを増やすためにアタッチ
-    [SerializeField] private float boaderZ; // 横穴に落ちたかどうかはz軸で判定
-    [SerializeField] private float boaderY; // 一定の高さまで落ちたメダルを消去する
+    [SerializeField] PlayerDataManager playerDataScript; // 落下時に所持メダルを増やすためにアタッチ
+    [SerializeField] SlotManager slotScript; // スロットストックを増やすためにアタッチ
+    [SerializeField] FieldManager fieldScript; // outMedalを増やすためにアタッチ
+    [SerializeField] SoundController soundScript; // 音を鳴らすためにアタッチ
+    [SerializeField] float boaderZ; // 横穴に落ちたかどうかはz軸で判定
+    [SerializeField] float boaderY; // 一定の高さまで落ちたメダルを消去する
     // Start is called before the first frame update
     void Start()
     {
@@ -22,19 +25,23 @@ public class MedalController : MonoBehaviour
         {
             if(gameObject.transform.position.z < boaderZ) // 手前側で落ちたらメダルゲット
             {
-                playerDataScript.medal += 1;
+                playerDataScript.MedalProperty++; // 持ちメダルを増やす
+                fieldScript.OutMedalProperty++; // outMedalを増やす
                 //Debug.Log("持ちメダルは" + playerDataScript.medal + "枚");
+                soundScript.PlaySE(CommonConstManager.MEDALGET); // SEを鳴らす
             }
             Destroy(gameObject); // メダルを消去
         }
     }
 
     /* 生成する際に外れたアタッチをつける */
-    public void MedalSetUp(PlayerDataManager getPlayerScript, SlotManager getSlotScript)
+    public void MedalSetUp(PlayerDataManager getPlayerScript, SlotManager getSlotScript, FieldManager getFieldScript, SoundController getSoundScript)
     {
         /* 受け取ったスクリプトをセットする */
         playerDataScript = getPlayerScript;
         slotScript = getSlotScript;
+        fieldScript = getFieldScript;
+        soundScript = getSoundScript;
     }
 
     /* スロットチェッカーを通過したらスロットストックを増やす */
@@ -42,7 +49,7 @@ public class MedalController : MonoBehaviour
     {
         if(other.CompareTag("SlotChecker"))
         {
-            slotScript.SlotStockPlus();
+            slotScript.SlotStockProperty++;
         }        
     }
 }
