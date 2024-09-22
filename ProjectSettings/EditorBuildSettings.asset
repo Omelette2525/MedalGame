@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/PusherScene.unity
+    guid: 97dd738e4ef77684a8ec40c37a565ade
   m_configObjects: {}
