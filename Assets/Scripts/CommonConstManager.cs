@@ -32,5 +32,11 @@ namespace CommonConst
         public const int BALLFALL = 6;
         public const int POCKETIN = 7;
         public const int EVENTBALLGEN = 8;
+
+        /* playerprefs用のキー 末尾にPをつける*/
+        public const string MEDAL_P = "haveMedal"; // 持ちメダル
+        public const string MAXMEDAL_P = "maxMedal"; // 最高持ちメダル
+        public const string SJPCMAX_WIN_P = "shadowJpcMaxWin"; // shadowJpcで得た最高枚数
+        public const string SJPCMAX_LEVEL_P = "shadowJpcLevelWhenGetMaxWin"; // shadowJpcで最高枚数を出したときのshadowJpclevel
     }
 }

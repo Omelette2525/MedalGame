@@ -15,6 +15,7 @@ public class JpcManager : MonoBehaviour
     [SerializeField] MedalGenerate medalGenerateScript; // 払い出しメダルを増やすために使う
     [SerializeField] EventOrderManager eventOrderScript; // イベントフラグの操作に使う
     [SerializeField] UIManager UIScript; // 得たものの表示に使う
+    [SerializeField] PlayerDataManager playerDataScript; // shadowJpcの記録更新に使う
     [SerializeField] Canvas shadowJpcCanvas; // shadowJpcのuiの表示を切り替えるのに使う
     [SerializeField] TMP_Text shadowJpcInfo; // shadowJPCの情報を表示するのに使う
     [SerializeField] Image[] shadowJpcSteps; // shadowJpcのstepを表示するのに使う
@@ -34,6 +35,7 @@ public class JpcManager : MonoBehaviour
     [SerializeField] GameObject jpcPocketOUT; // outpocketのプレハブ
 
     private int nowJpc; // 現在何のjpcを実行しているのか格納する変数 0なら何も実行していない
+    private int nowLevel; // 現在のjpcが何lvか 0なら何も実行していない
     private int brightJpBonus; // brightJPを獲得したときの獲得メダル
     private bool isJpc; // jpc実行中かどうか
     private bool isPocketInNow; // ポケットにボールが入っているか 入っているなら重複を防ぐために処理しない
@@ -116,20 +118,14 @@ public class JpcManager : MonoBehaviour
     public async void BrightJpc(int upgradeLv)
     {
         brightJpcDonutsChange(upgradeLv); // lvに応じてポケットの内容を変更する lvが高いほどjpポケットは増え、メダル数も増える
-        isJpc = true; // jpcスタート
-        nowJpc = CommonConstManager.BRIGHTJPC; // brightjpcを実行していることを入れておく
-        brightJpcCamera.GetComponent<CinemachineVirtualCamera>().Priority = 11; // カメラ切り替え
-        await WaitTaskAsync(WAIT); // 間を入れる
+        await JpcInit(upgradeLv, CommonConstManager.BRIGHTJPC, brightJpcCamera); // 共通初期化処理
         ballGenerateScript.BrightBallGenerate(); // brightballを出す
         jpcTimer = 0; // タイマー初期化
         isPocketInNow = false; // 何も入っていない状態に更新
     }
     public async void ShadowJpc(int upgradeLv)
     {
-        isJpc = true; // jpcフラグをtrueにする
-        nowJpc = CommonConstManager.SHADOWJPC; // shadowJpcを実行していることを入れておく
-        shadowJpcCamera.GetComponent<CinemachineVirtualCamera>().Priority = 11; // カメラ切り替え
-        await WaitTaskAsync(WAIT); // 間を入れる
+        await JpcInit(upgradeLv, CommonConstManager.SHADOWJPC, shadowJpcCamera); // 共通初期化処理
         /* 初期化 */
         shadowJpcState = 0;
         shadowJpcNowBalls = 1;
@@ -140,6 +136,16 @@ public class JpcManager : MonoBehaviour
         ballGenerateScript.ShadowBallGenerate(); // shadowBallを出す
         jpcTimer = 0; // タイマー初期化
         isPocketInNow = false; // 何も入っていない状態に更新
+    }
+
+    /* 共通の初期化処理をする */
+    private async Task JpcInit(int level, int jpcKind, CinemachineVirtualCamera camera)
+    {
+        isJpc = true; // jpcフラグをtrueにする
+        nowJpc = jpcKind; // 実行中のjpcがなにか入れておく
+        nowLevel = level; // 何levelか入れておく
+        camera.GetComponent<CinemachineVirtualCamera>().Priority = 11; // カメラ切り替え
+        await WaitTaskAsync(WAIT); // 間を入れる
     }
 
     /* jpcの機械の何らかのポケットに入った */
@@ -199,6 +205,11 @@ public class JpcManager : MonoBehaviour
                     {
                         Debug.Log(shadowJpcWinMedals + "枚獲得[JpcManager]");
                         medalGenerateScript.PayoutMedalProperty += shadowJpcWinMedals;
+                        /* 記録更新したら、更新関数を実行する */
+                        if(shadowJpcWinMedals > playerDataScript.SJpcMaxWinProperty)
+                        {
+                            playerDataScript.SJpcMaxUpdate(shadowJpcWinMedals, nowLevel);
+                        }
                         isJpc = false; // jpcが終了したので、falseにする
                         break; // そのままswitch文を抜ける
                     }
@@ -238,6 +249,9 @@ public class JpcManager : MonoBehaviour
             shadowJpcCanvas.enabled = false; // shadowjpcの情報を非表示にする
             await WaitTaskAsync(WAIT);
             eventOrderScript.IsEventProperty = false; // イベント実行中フラグをfalseにする
+            /* リセット処理 */
+            nowJpc = 0;
+            nowLevel = 0;
         }
         isPocketInNow = false; // 処理が終わったのでポケットin状態を解除
     }

@@ -17,6 +17,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] Slider supplyGauge; // 補給の様子を描画するスライダー
     [SerializeField] TMP_Text getSomethingText; // 何かを得たときに告知するテキスト
     [SerializeField] GameObject escapePanel; // Escキーを押したときに表示されるパネル
+    [SerializeField] TMP_Text maxMedalText; // maxmedalを表示
+    [SerializeField] TMP_Text shadowJpcMaxText; // shadowJpcの情報を表示
 
     /* Debug用text */
     [SerializeField] TMP_Text inMedalText;
@@ -28,6 +30,8 @@ public class UIManager : MonoBehaviour
 
     private long currentMedal = 0; // 持ちメダルに変化があったか検出するための変数 とりあえず0を入れておく
     private long currentPayout = 0; // 払い出しメダル
+    private long currentMaxMedal = 0; // maxmedal
+    private int currentShadowJpcMaxWin = 0; // maxwin
 
     /* Debug用 */
     private long  currentInMedal = 0;
@@ -40,6 +44,8 @@ public class UIManager : MonoBehaviour
 
     private string medalFormat; // format形式で最初のテキストを読み込み、それに従って描画する
     private string payoutFormat;
+    private string maxMedalFormat;
+    private string shadowJpcMaxFormat;
 
     /* Debug用format */
     private string inMedalFormat;
@@ -59,8 +65,11 @@ public class UIManager : MonoBehaviour
         /* format記憶 */
         medalFormat = medalText.text;
         payoutFormat = payoutText.text; 
+        maxMedalFormat = maxMedalText.text;
+        shadowJpcMaxFormat = shadowJpcMaxText.text;
 
         supplyGauge.maxValue = CommonConstManager.SUPPLYTIME / 1000; // ゲージの最大値を補給にかかる時間にしておく
+        ShadowJpcMaxInfoUpdate(0, 0); // start時は0枚、0lv つまり1回も行っていないものとして表記をリセットする
         currentTime = DISPLAYTIME + 1; // 最初は表示させないためにDISPLAYTIMEより大きい値にしておく
 
         /* Debug用format */
@@ -96,7 +105,9 @@ public class UIManager : MonoBehaviour
         /* 描画する情報を受け取る */
         long getMedal = playerDataScript.MedalProperty;
         long getPayout = medalGenerateScript.PayoutMedalProperty;
+        long getMaxMedal = playerDataScript.MaxMedalProperty;
         float getSupplyGauge = playerDataScript.CurrentTimeProperty;
+        int getShadowJpcMaxWin = playerDataScript.SJpcMaxWinProperty;
         /* Debug用 */
         long getInMedal = fieldScript.InMedalProperty;
         long getOutMedal = fieldScript.OutMedalProperty;
@@ -108,6 +119,7 @@ public class UIManager : MonoBehaviour
         /* 描画更新 */
         ObserveInfo<long>(ref currentMedal, getMedal, medalText, medalFormat);
         ObserveInfo<long>(ref currentPayout, getPayout, payoutText, payoutFormat);
+        ObserveInfo<long>(ref currentMaxMedal, getMaxMedal, maxMedalText, maxMedalFormat);
 
         /* payoutは0枚になったら非表示 */
         if(currentPayout == 0 && payoutText.enabled == true)
@@ -132,6 +144,14 @@ public class UIManager : MonoBehaviour
             supplyGauge.gameObject.SetActive(true);
         }
 
+        /* shadowJpcMaxの描画更新 */
+        /* 値が変わったら更新して表示 */
+        if(currentShadowJpcMaxWin != getShadowJpcMaxWin)
+        {
+            currentShadowJpcMaxWin = getShadowJpcMaxWin;
+            ShadowJpcMaxInfoUpdate(currentShadowJpcMaxWin, playerDataScript.SJpcMaxLevelProperty);
+        }
+
         /* Debug用 */
         ObserveInfo<long>(ref currentInMedal, getInMedal, inMedalText, inMedalFormat);
         ObserveInfo<long>(ref currentOutMedal, getOutMedal, outMedalText, outMedalFormat);
@@ -148,6 +168,20 @@ public class UIManager : MonoBehaviour
         {
             nowInfo = getInfo; // 中身更新
             outText.text = string.Format(format, nowInfo); // テキストを今の情報に変更
+        }
+    }
+
+    /* 1度も行われていない場合は表記が違う & 変数が2つなので、ジェネリック関数を使わない */
+    public void ShadowJpcMaxInfoUpdate(int maxWin, int level)
+    {
+        /* levelが0なら、まだ一度もsjpcを行っていない */
+        if(level == 0)
+        {
+            shadowJpcMaxText.text = string.Format(shadowJpcMaxFormat, "Nothing");
+        }
+        else // そうでないなら、情報を表示
+        {
+            shadowJpcMaxText.text = string.Format(shadowJpcMaxFormat, maxWin + " (Lv:" + level + ")");
         }
     }
 
