@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonConst;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using R3;
 
 public class MedalGenerate : MonoBehaviour
 {
@@ -34,8 +37,10 @@ public class MedalGenerate : MonoBehaviour
     [SerializeField] float medalPosY;
     [SerializeField] float medalPosZ;
     [SerializeField] Vector3 throwPower; // メダルを投げる強さ
+    [SerializeField] UIManager uiManagerScript; // UIの状態を取得するために使う
     private float throwTimer; // メダル投げタイマー
     private float payoutTimer; // 払い出しタイマー
+    private bool isUIOpen = false; // UIが開いているかどうか
 
     const int PAYOUTONCE = 5; // 一度に払い出すメダルの枚数
     private int payoutState; // 払い出しの状態 決まった単位で払い出しをするために、この数値がPAYOUTONCEの倍数になったらクールタイムをつける
@@ -45,6 +50,19 @@ public class MedalGenerate : MonoBehaviour
         throwTimer = 0; // 最初はクールタイムなし
         payoutTimer = 0;
         payoutState = 0; // 1枚も払い出していない状態
+        Bind();
+    }
+
+    void Bind()
+    {
+        uiManagerScript.UIPanelProp
+        .Subscribe(OnUIStateChanged) // ←ラムダで明示的にAction<bool>を渡す
+        .AddTo(gameObject); // UIの状態が変わったときにOnUIStateChangedを呼び出す
+    }
+
+    private void OnUIStateChanged(bool isOpen)
+    {
+        isUIOpen = isOpen; // UIの状態を更新
     }
 
     // Update is called once per frame
@@ -126,8 +144,9 @@ public class MedalGenerate : MonoBehaviour
     /* メダルを投げるかの判定 */
     bool CanThrowMedal()
     {
-        /* 左ボタンが押されていたら & メダルを持っていたら & クールタイムを消化していたら & イベント中でないなら イベント中だとカメラの位置が変わってメダルの位置がおかしくなる */
-        return (Input.GetMouseButton(0) == true && playerDataScript.MedalProperty >= 1 && throwTimer <= 0 && eventOrderScript.IsEventProperty != true); // 条件を満たしていればtrueを返す
+        /* イベント中だとカメラの位置が変わってメダルの位置がおかしくなる */
+        return (Input.GetMouseButton(0) == true && playerDataScript.MedalProperty >= 1 && throwTimer <= 0 && eventOrderScript.IsEventProperty != true
+        && !isUIOpen); // 条件を満たしていればtrueを返す
     }
 
     /* メダルを払い出すかの判定 */

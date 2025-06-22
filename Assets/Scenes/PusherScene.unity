@@ -4095,6 +4095,7 @@ MonoBehaviour:
   medalPosY: 7
   medalPosZ: -5
   throwPower: {x: 0, y: 2, z: 10}
+  uiManagerScript: {fileID: 184649912}
 --- !u!114 &359935758
 MonoBehaviour:
   m_ObjectHideFlags: 0

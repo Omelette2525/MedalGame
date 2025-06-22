@@ -6,6 +6,8 @@ using System;
 using Unity.VisualScripting;
 using CommonConst;
 using UnityEngine.UI;
+using R3;
+using Cysharp.Threading.Tasks;
 
 public class UIManager : MonoBehaviour
 {
@@ -27,6 +29,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_Text outPerFieldPayoutText;
     [SerializeField] TMP_Text outPerInText;
     [SerializeField] TMP_Text fieldBallsText;
+
+    /* uiの状態 */
+    private readonly ReactiveProperty<bool> uiPanelProp = new ReactiveProperty<bool>(false); // 初期状態はfalse
+    public ReadOnlyReactiveProperty<bool> UIPanelProp => uiPanelProp; // uiの状態を外部から参照できるようにする
 
     private long currentMedal = 0; // 持ちメダルに変化があったか検出するための変数 とりあえず0を入れておく
     private long currentPayout = 0; // 払い出しメダル
@@ -64,7 +70,7 @@ public class UIManager : MonoBehaviour
     {
         /* format記憶 */
         medalFormat = medalText.text;
-        payoutFormat = payoutText.text; 
+        payoutFormat = payoutText.text;
         maxMedalFormat = maxMedalText.text;
         shadowJpcMaxFormat = shadowJpcMaxText.text;
 
@@ -79,16 +85,15 @@ public class UIManager : MonoBehaviour
         outPerFieldPayoutFormat = outPerFieldPayoutText.text;
         outPerInFormat = outPerInText.text;
         fieldBallsFormat = fieldBallsText.text;
-
-        // SomethingDisplay("test"); // test
     }
     // Update is called once per frame
     void Update()
     {
         /* Escが押されたらメニューを開いたり閉じたりする */
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             escapePanel.SetActive(!escapePanel.activeSelf); // 自身の状態の反対にする
+            uiPanelProp.Value = escapePanel.activeSelf; // uiの状態を更新
         }
 
         currentTime += Time.deltaTime; // 経過時間更新

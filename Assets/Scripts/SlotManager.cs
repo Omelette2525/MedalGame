@@ -177,7 +177,7 @@ public class SlotManager : MonoBehaviour
                 {
                     ballGenerateScript.PayoutNormalBallProperty++; // ノーマルボールの払い出し個数を+1する
                     Debug.Log("ボール当選[SlotManager]");
-                    UIScript.SomethingDisplay("ノーマルボール獲得！"); // 得たものを表示
+                    UIScript.SomethingDisplay("ボール獲得！"); // 得たものを表示
                     break;
                 }
                 case SLOT7: // 7が揃ったら 暫定処理としてメダルを払い出す
